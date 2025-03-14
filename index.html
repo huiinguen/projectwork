@@ -3,200 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Cá Nhân</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Real-Time Square Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        @keyframes planeFly {
-            from { transform: translateX(100vw); }
-            to { transform: translateX(-200vw); } 
-        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes floatAnimation {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0); }
+        @keyframes zoomIn {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
         }
-        
+
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
             font-family: 'Roboto', sans-serif;
-            background-image: url('1.jpg');
+            background-image: url('1.jpg'); /* Keep the background if '1.jpg' exists */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
-      .plane {
-            position: absolute;
-            top: 20%;
-            right: -150px;
-            width: 100px;
-            animation: planeFly 3s linear forwards;
-        }
-
-      .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 20px;
-            max-width: 800px;
-            width: 100%;
+        /* Cải tiến đồng hồ: Thêm nền mờ và hiệu ứng cho toàn bộ đồng hồ */
+        .clock-container {
+            position: relative;
+            width: 300px; /* Adjusted width to fit three squares */
+            height: 150px; /* Tăng chiều cao để chứa ngày tháng */
             opacity: 0;
-            animation: fadeIn 1s ease-out 3s forwards;
-        }
-
-      .profile-card {
-            background-color: rgba(255, 255, 255, 0.9);
+            animation: fadeIn 1s ease-out 1s forwards;
+            display: flex;
+            flex-direction: column; /* Sắp xếp theo cột: thời gian trên, ngày tháng dưới */
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(45deg, #ff6f61, #6b5b95, #88d8b0); /* Gradient màu pha nhau */
             border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
             padding: 20px;
-            flex: 1;
-            min-width: 200px;
-            max-width: 400px;
-            animation: floatAnimation 3s infinite ease-in-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); /* Bóng đổ để làm nổi bật */
         }
 
-      .profile-card img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
+        /* Container cho các ô thời gian */
+        .time-squares {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 20px;
         }
 
-      .profile-card h2 {
-            font-size: 14px;
-            color: rgba(0, 0, 0, 0.6);
-            font-style: italic;
-            cursor: pointer;
+        /* Cải tiến ô thời gian: Thêm ánh sáng và hiệu ứng hover */
+        .time-square {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.2); /* Nền mờ để tương phản với gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #ffffff; /* Viền trắng để nổi bật */
+            border-radius: 10px; /* Bo góc nhiều hơn để trông hiện đại */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
         }
 
-      .profile-card h2:hover {
-            text-decoration: underline;
+        /* Hiệu ứng ánh sáng khi hover vào ô thời gian */
+        .time-square:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7); /* Ánh sáng trắng khi hover */
         }
 
-      .social-links a {
+        /* Hiệu ứng ánh sáng bên trong ô thời gian */
+        .time-square::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+
+        .time-square:hover::before {
+            transform: rotate(45deg);
+        }
+
+        .time-value {
             font-size: 24px;
-            text-decoration: none;
-            margin: 0 10px;
-            transition: transform 0.3s ease-in-out;
+            font-weight: bold;
+            color: #ffffff; /* Màu trắng để dễ nhìn trên nền gradient */
+            text-align: center;
+            z-index: 1; /* Đảm bảo chữ nằm trên hiệu ứng ánh sáng */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Bóng chữ để tăng độ tương phản */
         }
 
-      .social-links a[href*="facebook"] { color: #1877F2; }
-      .social-links a[href*="tiktok"] { color: #69C9D0; }
-      .social-links a[href*="instagram"] { color: #E4405F; }
-
-      .verified {
-            color: #1DA1F2;
+        .time-value.zoom {
+            animation: zoomIn 0.5s ease-in-out; /* Hiệu ứng phóng to mượt mà khi số thay đổi */
         }
 
-        /* Taskbar styles */
-      .taskbar {
+        /* Thanh taskbar bên trái - Pha nhiều màu bằng gradient */
+        .taskbar {
             position: fixed;
             left: 0;
             top: 0;
             height: 100%;
-            width: 60px; 
-            background-color: rgba(255, 255, 255, 0.8);
+            width: 60px;
+            background: linear-gradient(45deg, #1e90ff, #ff1493, #ffd700); /* Gradient chuyển màu */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             padding-top: 20px;
+            gap: 20px;
+            z-index: 1000; /* Đảm bảo taskbar nằm trên các phần tử khác */
         }
 
-      .taskbar-icon {
-            font-size: 30px;
-            margin-bottom: 20px;
-            color: #333;
+        /* Icon trong taskbar - Cải tiến với hiệu ứng phóng to khi hover và chuyển động ngẫu nhiên */
+        .taskbar-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            position: relative; /* Để tooltip hiển thị đúng vị trí */
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            animation: randomMove infinite linear; /* Chuyển động ngẫu nhiên */
         }
 
-        /* Work window styles */
-        #work-window {
+        /* Hiệu ứng phóng to khi hover */
+        .taskbar-icon:hover {
+            transform: scale(1.3); /* Phóng to 1.3 lần */
+            background-color: rgba(255, 255, 255, 0.5);
+            animation-play-state: paused; /* Tạm dừng animation khi hover */
+        }
+
+        /* Tooltip (ô chữ) hiển thị khi hover */
+        .taskbar-icon::after {
+            content: attr(data-tooltip); /* Lấy nội dung từ thuộc tính data-tooltip */
+            position: absolute;
+            left: 70px; /* Hiển thị bên phải icon */
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0; /* Ẩn mặc định */
+            visibility: hidden; /* Ẩn mặc định */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        /* Hiển thị tooltip khi hover */
+        .taskbar-icon:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Icon công việc (biểu tượng danh sách công việc) */
+        .work-icon::before {
+            content: '\1F4CB'; /* Unicode của biểu tượng clipboard (danh sách công việc) */
+            font-size: 24px;
+            color: #FFD700;
+        }
+
+        /* Icon thanh toán (biểu tượng tiền) */
+        .payment-icon::before {
+            content: '\1F4B0'; /* Unicode của biểu tượng túi tiền (thanh toán) */
+            font-size: 24px;
+            color: #00FF00; /* Màu xanh lá để phân biệt với icon công việc */
+        }
+
+        /* Chuyển động ngẫu nhiên của icon */
+        @keyframes randomMove {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-20px); }
+            50% { transform: translateY(20px); }
+            75% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Modal (cửa sổ popup) */
+        .modal {
+            display: none; /* Ẩn mặc định */
             position: fixed;
-            left: -100%; /* Ban đầu ẩn bên trái */
             top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            width: 100%; /* Điều chỉnh chiều rộng nếu cần */
-            background-color: white;
-            transition: transform 0.5s ease-in-out; /* Hiệu ứng trượt */
-            z-index: 1000; /* Đảm bảo cửa sổ ở trên cùng */
-            overflow-y: auto; 
+            background-color: rgba(0, 0, 0, 0.7); /* Nền mờ */
+            z-index: 2000; /* Đảm bảo modal nằm trên tất cả */
+            justify-content: center;
+            align-items: center;
         }
-        #work-window.show {
-            transform: translateX(100%); /* Hiển thị cửa sổ */
+
+        .modal-content {
+            position: relative;
+            background-color: #fff;
+            width: 80%;
+            height: 80%;
+            border-radius: 10px;
+            overflow: hidden;
         }
-        #work-window iframe {
+
+        /* Iframe để hiển thị nội dung của file HTML */
+        .modal-iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-        #close-work-window { /* Style cho icon đóng */
-            position: absolute; 
-            top: 10px; 
-            right: 10px; 
-            font-size: 20px; 
+
+        /* Nút đóng modal */
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #fff;
+            background-color: #ff0000;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background-color: #cc0000;
+        }
+
+        /* Phần hiển thị ngày tháng */
+        .date-container {
+            width: 100%;
+            text-align: center;
+            color: #ffffff;
+            font-style: italic;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
-
 <body>
-    <img src="plane.png" alt="Máy bay" class="plane">
-
+    <!-- Thanh taskbar bên trái -->
     <div class="taskbar">
-        <i class="fas fa-shopping-bag taskbar-icon" id="bag-icon"></i> 
+        <!-- Icon công việc - Khi hover sẽ phóng to và hiển thị tooltip "Work" -->
+        <div class="taskbar-icon work-icon" id="work-icon" data-tooltip="Work"></div>
+        <!-- Icon thanh toán - Khi hover sẽ phóng to và hiển thị tooltip "Payment" -->
+        <div class="taskbar-icon payment-icon" id="payment-icon" data-tooltip="Payment"></div>
     </div>
 
-    <div id="work-window"> 
-        <iframe src="work.html"></iframe>
-        <i class="fas fa-times" id="close-work-window"></i>
-    </div>
-
-    <div class="container">
-        <div class="profile-card">
-            <img src="huii.jpg" alt="Profile Picture">
-            <h1><i>Nguyễn Đức Huy</i> <i class="fas fa-check-circle verified"></i></h1>
-            <h2 onclick="navigator.clipboard.writeText('nguyenhuy1832006@gmail.com')">Email: nguyenhuy1832006@gmail.com</h2>
-            <p>Chia sẻ kiến thức, tư duy sáng tạo!</p>
-            <div class="social-links">
-                <a href="https://www.facebook.com/nhui18/" target="_blank"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.tiktok.com/@nhui.3" target="_blank"><i class="fab fa-tiktok"></i></a>
-                <a href="https://www.instagram.com/n_huii03/" target="_blank"><i class="fab fa-instagram"></i></a>
+    <div class="clock-container">
+        <div class="time-squares">
+            <div class="time-square" id="hours">
+                <div class="time-value" id="hour-value">00</div>
             </div>
+            <div class="time-square" id="minutes">
+                <div class="time-value" id="minute-value">00</div>
+            </div>
+            <div class="time-square" id="seconds">
+                <div class="time-value" id="second-value">00</div>
+            </div>
+        </div>
+        <!-- Phần hiển thị ngày tháng nằm trong khung đồng hồ, phía dưới -->
+        <div class="date-container" id="date-container"></div>
+    </div>
+
+    <!-- Modal để hiển thị work.html -->
+    <div class="modal" id="work-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-work-modal">×</span>
+            <iframe class="modal-iframe" id="work-iframe"></iframe>
+        </div>
+    </div>
+
+    <!-- Modal để hiển thị payment.html -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-payment-modal">×</span>
+            <iframe class="modal-iframe" id="payment-iframe"></iframe>
         </div>
     </div>
 
     <script>
-        const bagIcon = document.getElementById('bag-icon');
-        const workWindow = document.getElementById('work-window');
-        const closeWorkWindow = document.getElementById('close-work-window');
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
 
-        bagIcon.addEventListener('click', () => {
-            workWindow.classList.toggle('show'); // Toggle để đóng/mở
-        });
+            const hourValue = document.getElementById('hour-value');
+            const minuteValue = document.getElementById('minute-value');
+            const secondValue = document.getElementById('second-value');
 
-        closeWorkWindow.addEventListener('click', () => {
-            workWindow.classList.remove('show');
-        });
-
-        // Đóng cửa sổ khi nhấp ra ngoài (tùy chọn)
-        workWindow.addEventListener('click', (event) => {
-            if (event.target === workWindow) {
-                workWindow.classList.remove('show');
+            // Update Hours
+            const hourText = hours.toString().padStart(2, '0');
+            if (hourValue.innerText !== hourText) {
+                hourValue.innerText = hourText;
+                hourValue.classList.add('zoom'); // Thêm hiệu ứng phóng to khi số giờ thay đổi
+                setTimeout(() => hourValue.classList.remove('zoom'), 500);
             }
+
+            // Update Minutes
+            const minuteText = minutes.toString().padStart(2, '0');
+            if (minuteValue.innerText !== minuteText) {
+                minuteValue.innerText = minuteText;
+                minuteValue.classList.add('zoom'); // Thêm hiệu ứng phóng to khi số phút thay đổi
+                setTimeout(() => minuteValue.classList.remove('zoom'), 500);
+            }
+
+            // Update Seconds
+            const secondText = seconds.toString().padStart(2, '0');
+            if (secondValue.innerText !== secondText) {
+                secondValue.innerText = secondText;
+                secondValue.classList.add('zoom'); // Thêm hiệu ứng phóng to khi số giây thay đổi
+                setTimeout(() => secondValue.classList.remove('zoom'), 500);
+            }
+
+            // Cập nhật ngày tháng
+            const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+            const dayName = days[now.getDay()];
+            const day = now.getDate();
+            const month = now.getMonth() + 1; // Tháng bắt đầu từ 0
+            const year = now.getFullYear();
+            document.getElementById('date-container').innerText = `${dayName}, ${day}/${month}/${year}`;
+        }
+
+        // Update clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call to set the time immediately
+
+        // --- Xử lý sự kiện mở và đóng modal cho icon Work ---
+        const workIcon = document.getElementById('work-icon');
+        const workModal = document.getElementById('work-modal');
+        const workIframe = document.getElementById('work-iframe');
+        const closeWorkModal = document.getElementById('close-work-modal');
+
+        // Khi nhấn vào icon công việc, mở modal và tải work.html
+        workIcon.addEventListener('click', function() {
+            workIframe.src = 'work.html'; // Liên kết đến file work.html
+            workModal.style.display = 'flex'; // Hiển thị modal
+        });
+
+        // Khi nhấn nút "X", đóng modal của work.html
+        closeWorkModal.addEventListener('click', function() {
+            workModal.style.display = 'none'; // Ẩn modal
+            workIframe.src = ''; // Xóa nội dung iframe để tiết kiệm tài nguyên
+        });
+
+        // Đóng modal của work.html khi nhấn ra ngoài vùng nội dung
+        workModal.addEventListener('click', function(event) {
+            if (event.target === workModal) {
+                workModal.style.display = 'none';
+                workIframe.src = '';
+            }
+        });
+
+        // --- Xử lý sự kiện mở và đóng modal cho icon Payment ---
+        const paymentIcon = document.getElementById('payment-icon');
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentIframe = document.getElementById('payment-iframe');
+        const closePaymentModal = document.getElementById('close-payment-modal');
+
+        // Khi nhấn vào icon thanh toán, mở modal và tải payment.html
+        paymentIcon.addEventListener('click', function() {
+            paymentIframe.src = 'payment.html'; // Liên kết đến file payment.html
+            paymentModal.style.display = 'flex'; // Hiển thị modal
+        });
+
+        // Khi nhấn nút "X", đóng modal của payment.html
+        closePaymentModal.addEventListener('click', function() {
+            paymentModal.style.display = 'none'; // Ẩn modal
+            paymentIframe.src = ''; // Xóa nội dung iframe để tiết kiệm tài nguyên
+        });
+
+        // Đóng modal của payment.html khi nhấn ra ngoài vùng nội dung
+        paymentModal.addEventListener('click', function(event) {
+            if (event.target === paymentModal) {
+                paymentModal.style.display = 'none';
+                paymentIframe.src = '';
+            }
+        });
+
+        // Khởi tạo animation ngẫu nhiên cho các icon
+        const icons = document.querySelectorAll('.taskbar-icon');
+        icons.forEach(icon => {
+            const randomDuration = Math.random() * 5 + 3; // Thời gian ngẫu nhiên từ 3-8 giây
+            icon.style.animationDuration = `${randomDuration}s`; // Áp dụng thời gian ngẫu nhiên
         });
     </script>
 </body>
