@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử Thanh toán</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(45deg, #ff6f61, #6b5b95, #88d8b0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .history-container {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+            color: red;
+        }
+
+        .history-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        .history-table th {
+            background-color: #6b5b95;
+            color: #fff;
+        }
+
+        .timer {
+            font-weight: bold;
+            color: #6b5b95;
+        }
+
+        .expired {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <span class="close-btn" onclick="goBack()">&times;</span>
+        <div class="history-title">Lịch sử Thanh toán</div>
+        <table class="history-table" id="history-table">
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Tiền</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let timerIntervals = {};
+
+        window.onload = function() {
+            updateHistoryTable();
+        };
+
+        function updateHistoryTable() {
+            const history = JSON.parse(localStorage.getItem('paymentHistory') || '[]');
+            const tbody = document.getElementById('history-body');
+            tbody.innerHTML = '';
+
+            history.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.time}</td>
+                    <td>${entry.product}</td>
+                    <td>${entry.quantity}</td>
+                    <td>${parseInt(entry.amount).toLocaleString('vi-VN')} VND</td>
+                    <td>${parseInt(entry.total).toLocaleString('vi-VN')} VND</td>
+                    <td>
+                        Chờ duyệt: <span class="timer" id="timer-${index}"></span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+                startTimer(index, entry.endTime);
+            });
+        }
+
+        function startTimer(index, endTimeMs) {
+            if (timerIntervals[index]) {
+                clearInterval(timerIntervals[index]);
+            }
+
+            const timerDisplay = document.getElementById(`timer-${index}`);
+            if (!timerDisplay) return;
+
+            timerIntervals[index] = setInterval(() => {
+                const currentTime = new Date().getTime();
+                const timeLeft = endTimeMs - currentTime;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerIntervals[index]);
+                    timerDisplay.innerText = 'Hết hạn';
+                    timerDisplay.classList.add('expired');
+                    return;
+                }
+
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                timerDisplay.innerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function goBack() {
+            window.location.href = 'payment.html';
+        }
+    </script>
+</body>
+</html>
